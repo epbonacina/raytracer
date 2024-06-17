@@ -1,4 +1,4 @@
-use crate::{vec3::Vec3, MAX_COLOR};
+use crate::{camera::MAX_COLOR, vec3::Vec3};
 
 pub type Color = Vec3;
 
@@ -15,4 +15,3 @@ impl Color {
         println!("{ru} {gu} {bu}");
     }
 }
-
