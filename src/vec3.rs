@@ -65,12 +65,21 @@ impl Vec3 {
         self.e[2]
     }
 
+    pub fn is_near_zero(&self) -> bool {
+        let threshold = 1e-8;
+        self.e.iter().all(|elem| elem < &threshold)
+    }
+
     pub fn len(&self) -> f64 {
         self.len_squared().sqrt()
     }
 
     pub fn len_squared(&self) -> f64 {
         self.x().powi(2) + self.y().powi(2) + self.z().powi(2)
+    }
+
+    pub fn reflect(&self, normal: &Vec3) -> Vec3 {
+        self - &(2.0 * &(self.dot(normal) * normal))
     }
 
     pub fn dot(&self, other: &Vec3) -> f64 {
