@@ -1,3 +1,5 @@
+use rand::Rng;
+
 pub type Point3 = Vec3;
 
 #[derive(Clone)]
@@ -12,6 +14,43 @@ impl Vec3 {
 
     pub fn new_with(x: f64, y: f64, z: f64) -> Vec3 {
         Vec3 { e: [x, y, z] }
+    }
+
+    pub fn random() -> Vec3 {
+        let mut rng = rand::thread_rng();
+        let x = rng.gen_range(0.0..1.0);
+        let y = rng.gen_range(0.0..1.0);
+        let z = rng.gen_range(0.0..1.0);
+        Vec3::new_with(x, y, z)
+    }
+
+    pub fn random_with(min: f64, max: f64) -> Vec3 {
+        let mut rng = rand::thread_rng();
+        let x = rng.gen_range(min..max);
+        let y = rng.gen_range(min..max);
+        let z = rng.gen_range(min..max);
+        Vec3::new_with(x, y, z)
+    }
+
+    pub fn random_in_unit_sphere() -> Vec3 {
+        loop {
+            let p = Vec3::random_with(-1.0, 1.0);
+            if p.len_squared() < 1.0 {
+                return p;
+            }
+        }
+    }
+
+    pub fn random_unit_vector() -> Vec3 {
+        Vec3::random_in_unit_sphere().unit_vector()
+    }
+
+    pub fn random_on_hemisphere(normal: &Vec3) -> Vec3 {
+        let on_unit_sphere = Vec3::random_unit_vector();
+        if on_unit_sphere.dot(&normal) > 0.0 {
+            return on_unit_sphere;
+        }
+        return -&on_unit_sphere;
     }
 
     pub fn x(&self) -> f64 {
