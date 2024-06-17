@@ -22,7 +22,7 @@ fn log(text: &str) {
 }
 
 fn ray_color(ray: &Ray, world: &dyn Hittable) -> Color {
-    match world.hits(ray, 0.0, utils::INFINITY) {
+    match world.hits(ray, 0.0..utils::INFINITY) {
         Some(hit_record) => 0.5 * &(&hit_record.normal + &Color::new_with(1.0, 1.0, 1.0)),
         None => {
             let unit_direction = ray.direction().unit_vector();
