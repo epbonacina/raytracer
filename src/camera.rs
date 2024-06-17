@@ -110,9 +110,9 @@ impl Camera {
             return Color::new();
         }
 
-        match world.hits(ray, 0.0..utils::INFINITY) {
+        match world.hits(ray, 0.001..utils::INFINITY) {
             Some(hit_record) => {
-                let direction = Vec3::random_on_hemisphere(&hit_record.normal);
+                let direction = &hit_record.normal + &Vec3::random_unit_vector();
                 0.5 * &self.ray_color(&Ray::new(hit_record.p, direction), depth - 1, world)
             }
             None => {
