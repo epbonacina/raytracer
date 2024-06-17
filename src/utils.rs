@@ -11,10 +11,16 @@ pub fn degrees_to_radians(degrees: f64) -> f64 {
 
 pub trait Interval {
     fn surrounds(&self, value: f64) -> bool;
+    fn make_fit(&self, value: f64) -> f64;
 }
 
 impl Interval for Range<f64> {
     fn surrounds(&self, value: f64) -> bool {
         self.start < value && self.end > value
+    }
+
+    fn make_fit(&self, value: f64) -> f64 {
+        let value = value.max(self.start);
+        value.min(self.end)
     }
 }
