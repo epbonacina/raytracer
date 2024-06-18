@@ -78,8 +78,18 @@ impl Material for Dielectric {
         };
 
         let unit_direction = ray_in.direction().unit_vector();
-        let refracted = unit_direction.refract(&rec.normal, ri);
-        let scattered = Ray::new(rec.p.clone(), refracted);
+
+        let cos_theta = -&unit_direction.dot(&rec.normal).min(1.0);
+        let sin_theta = (1.0 - cos_theta.powi(2)).sqrt();
+        let cannot_refract = ri * sin_theta > 1.0;
+
+        let direction = if cannot_refract {
+            unit_direction.reflect(&rec.normal)
+        } else {
+            unit_direction.refract(&rec.normal, ri)
+        };
+
+        let scattered = Ray::new(rec.p.clone(), direction);
         let attenuation = Color::new_with(1.0, 1.0, 1.0);
         Some((attenuation, scattered))
     }
