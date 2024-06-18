@@ -116,11 +116,7 @@ impl Camera {
                     hit_record.material.scatter(ray, &hit_record)
                 {
                     let color = self.ray_color(&scattered, depth - 1, world);
-                    return Color::new_with(
-                        color.x() * attenuation.x(),
-                        color.y() * attenuation.y(),
-                        color.z() * attenuation.z(),
-                    );
+                    return &color * &attenuation;
                 }
                 return Color::new();
             }

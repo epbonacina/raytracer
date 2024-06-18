@@ -8,6 +8,8 @@ mod sphere;
 mod utils;
 mod vec3;
 
+use material::Dielectric;
+
 use crate::{
     camera::Camera,
     color::Color,
@@ -22,8 +24,8 @@ fn main() {
 
     let material_of_the_ground = LambertianMaterial::new(&Color::new_with(0.8, 0.8, 0.0));
     let center_ball_material = LambertianMaterial::new(&Color::new_with(0.1, 0.2, 0.5));
-    let right_ball_material = Metal::new(&Color::new_with(0.8, 0.6, 0.2), 1.0);
-    let left_ball_material = Metal::new(&Color::new_with(0.8, 0.8, 0.8), 0.1);
+    let right_ball_material = Metal::new(&Color::new_with(0.8, 0.6, 0.2), 0.3);
+    let left_ball_material = Dielectric::new(1.5);
 
     world.add(Box::new(Sphere::new(
         &Point3::new_with(0.0, -100.5, -1.0),
