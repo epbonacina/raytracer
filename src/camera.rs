@@ -12,6 +12,7 @@ pub const MAX_COLOR: u8 = 255;
 pub struct Camera {
     aspect_ratio: f64,
     image_width: u16,
+    vfov: f64,
     image_height: u16,
     center: Point3,
     samples_per_pixel: u16,
@@ -28,10 +29,13 @@ impl Camera {
         let aspect_ratio = 16.0 / 9.0;
         let image_height = (image_width as f64 / aspect_ratio) as u16;
         let image_height = std::cmp::max(image_height, 1);
+        let vfov = 90.0;
 
         let center = Point3::new();
         let focal_length = 1.0;
-        let viewport_height = 2.0;
+        let theta = utils::degrees_to_radians(vfov);
+        let h = (theta/2.0).tan();
+        let viewport_height = 2.0 * h * focal_length;
         let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
 
         let viewport_u = Vec3::new_with(viewport_width, 0.0, 0.0);
@@ -52,6 +56,7 @@ impl Camera {
         Camera {
             image_width,
             image_height,
+            vfov,
             aspect_ratio,
             center,
             samples_per_pixel,
