@@ -25,7 +25,8 @@ fn main() {
     let material_of_the_ground = LambertianMaterial::new(&Color::new_with(0.8, 0.8, 0.0));
     let center_ball_material = LambertianMaterial::new(&Color::new_with(0.1, 0.2, 0.5));
     let right_ball_material = Metal::new(&Color::new_with(0.8, 0.6, 0.2), 0.3);
-    let left_ball_material = Dielectric::new(1.0/1.33);
+    let left_ball_material = Dielectric::new(1.50);
+    let left_bubble_material = Dielectric::new(1.0/1.50);
 
     world.add(Box::new(Sphere::new(
         &Point3::new_with(0.0, -100.5, -1.0),
@@ -41,6 +42,11 @@ fn main() {
         &Point3::new_with(-1.0, 0.0, -1.0),
         0.5,
         Box::new(left_ball_material),
+    )));
+    world.add(Box::new(Sphere::new(
+        &Point3::new_with(-1.0, 0.0, -1.0),
+        0.4,
+        Box::new(left_bubble_material),
     )));
     world.add(Box::new(Sphere::new(
         &Point3::new_with(1.0, 0.0, -1.0),
