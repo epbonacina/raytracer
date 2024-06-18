@@ -16,7 +16,7 @@ use crate::{
     hittable_list::HittableList,
     material::{LambertianMaterial, Material, Metal},
     sphere::Sphere,
-    vec3::Point3,
+    vec3::{Point3, Vec3},
 };
 
 fn main() {
@@ -54,6 +54,10 @@ fn main() {
         Box::new(right_ball_material),
     )));
 
-    let camera = Camera::new();
+    let mut camera = Camera::new();
+    camera.lookfrom = Point3::new_with(-2.0, 2.0, 1.0);
+    camera.lookat = Point3::new_with(0.0, 0.0, -1.0);
+    camera.vup = Vec3::new_with(0.0, 1.0, 0.0);
+    camera.vfov = 20.0;
     camera.render(&world);
 }

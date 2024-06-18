@@ -10,65 +10,90 @@ use rand::Rng;
 pub const MAX_COLOR: u8 = 255;
 
 pub struct Camera {
-    aspect_ratio: f64,
-    image_width: u16,
-    vfov: f64,
-    image_height: u16,
-    center: Point3,
-    samples_per_pixel: u16,
-    pixel_samples_scale: f64,
-    pixel00_loc: Point3,
-    pixel_delta_u: Vec3,
-    pixel_delta_v: Vec3,
-    max_bounces: u16,
+    pub aspect_ratio: f64,
+    pub image_width: u16,
+    pub lookfrom: Point3,
+    pub lookat: Point3,
+    pub vup: Vec3,
+    pub vfov: f64,
+    pub u: Vec3,
+    pub v: Vec3,
+    pub w: Vec3,
+    pub image_height: u16,
+    pub center: Point3,
+    pub samples_per_pixel: u16,
+    pub pixel_samples_scale: f64,
+    pub pixel00_loc: Point3,
+    pub pixel_delta_u: Vec3,
+    pub pixel_delta_v: Vec3,
+    pub max_bounces: u16,
 }
 
 impl Camera {
     pub fn new() -> Camera {
         let image_width = 400;
         let aspect_ratio = 16.0 / 9.0;
-        let image_height = (image_width as f64 / aspect_ratio) as u16;
-        let image_height = std::cmp::max(image_height, 1);
         let vfov = 90.0;
 
-        let center = Point3::new();
-        let focal_length = 1.0;
-        let theta = utils::degrees_to_radians(vfov);
-        let h = (theta/2.0).tan();
-        let viewport_height = 2.0 * h * focal_length;
-        let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
-
-        let viewport_u = Vec3::new_with(viewport_width, 0.0, 0.0);
-        let viewport_v = Vec3::new_with(0.0, -viewport_height, 0.0);
+        let lookfrom = Point3::new_with(0.0, 0.0, 0.0);
+        let lookat = Point3::new_with(0.0, 0.0, -1.0);
+        let vup = Vec3::new_with(0.0, 1.0, 0.0);
 
         let samples_per_pixel = 100;
-        let pixel_samples_scale = 1.0 / samples_per_pixel as f64;
-        let pixel_delta_u = &viewport_u / image_width as f64;
-        let pixel_delta_v = &viewport_v / image_height as f64;
-
-        let viewport_upper_left = &(&(&center - &Vec3::new_with(0.0, 0.0, focal_length))
-            - &(&viewport_u / 2.0))
-            - &(&viewport_v / 2.0);
-
-        let pixel00_loc = &viewport_upper_left + &(0.5 * &(&pixel_delta_u + &pixel_delta_v));
         let max_bounces = 50;
 
         Camera {
             image_width,
-            image_height,
-            vfov,
             aspect_ratio,
-            center,
-            samples_per_pixel,
-            pixel_samples_scale,
-            pixel00_loc,
-            pixel_delta_u,
-            pixel_delta_v,
             max_bounces,
+            samples_per_pixel,
+            lookfrom,
+            lookat,
+            vup,
+            vfov,
+            image_height: 0,
+            u: Vec3::new(),
+            w: Vec3::new(),
+            v: Vec3::new(),
+            center: Point3::new(),
+            pixel_samples_scale: 0.0,
+            pixel00_loc: Point3::new(),
+            pixel_delta_u: Vec3::new(),
+            pixel_delta_v: Vec3::new(),
         }
     }
 
-    pub fn render(&self, world: &dyn Hittable) {
+    fn initialize(&mut self) {
+        self.image_height = (self.image_width as f64 / self.aspect_ratio) as u16;
+        self.image_height = std::cmp::max(self.image_height, 1);
+
+        self.center = self.lookfrom.clone();
+        let focal_length = (&self.lookfrom - &self.lookat).len();
+        let theta = utils::degrees_to_radians(self.vfov);
+        let h = (theta / 2.0).tan();
+
+        let viewport_height = 2.0 * h * focal_length;
+        let viewport_width = viewport_height * (self.image_width as f64 / self.image_height as f64);
+
+        self.w = (&self.lookfrom - &self.lookat).unit_vector();
+        self.u = self.vup.cross(&self.w);
+        self.v = self.w.cross(&self.u);
+
+        let viewport_u = viewport_width * &self.u;
+        let viewport_v = viewport_height * &(-&self.v);
+
+        self.pixel_samples_scale = 1.0 / self.samples_per_pixel as f64;
+        self.pixel_delta_u = &viewport_u / self.image_width as f64;
+        self.pixel_delta_v = &viewport_v / self.image_height as f64;
+
+        let viewport_upper_left =
+            &(&(&self.center - &(focal_length * &self.w)) - &(&viewport_u / 2.0)) - &(&viewport_v / 2.0);
+
+        self.pixel00_loc = &viewport_upper_left + &(0.5 * &(&self.pixel_delta_u + &self.pixel_delta_v));
+    }
+
+    pub fn render(&mut self, world: &dyn Hittable) {
+        self.initialize();
         println!("P3");
         println!("{} {}", self.image_width, self.image_height);
         println!("255");
