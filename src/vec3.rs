@@ -53,6 +53,16 @@ impl Vec3 {
         return -&on_unit_sphere;
     }
 
+    pub fn random_in_unit_disk() -> Vec3 {
+        let mut rng = rand::thread_rng();
+        loop {
+            let p = Vec3::new_with(rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0), 0.0);
+            if p.len() < 1.0 {
+                return p
+            }
+        }
+    }
+
     pub fn x(&self) -> f64 {
         self.e[0]
     }
@@ -214,19 +224,5 @@ impl std::ops::DivAssign<f64> for Vec3 {
         self.e[0] /= value;
         self.e[1] /= value;
         self.e[2] /= value;
-    }
-}
-
-impl std::ops::Index<usize> for &Vec3 {
-    type Output = f64;
-
-    fn index<'a>(&'a self, i: usize) -> &'a f64 {
-        &self.e[i]
-    }
-}
-
-impl std::fmt::Display for Vec3 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} {} {}", self.x(), self.y(), self.z())
     }
 }

@@ -24,7 +24,7 @@ fn main() {
 
     let material_of_the_ground = LambertianMaterial::new(&Color::new_with(0.8, 0.8, 0.0));
     let center_ball_material = LambertianMaterial::new(&Color::new_with(0.1, 0.2, 0.5));
-    let right_ball_material = Metal::new(&Color::new_with(0.8, 0.6, 0.2), 0.3);
+    let right_ball_material = Metal::new(&Color::new_with(0.8, 0.6, 0.2), 1.0);
     let left_ball_material = Dielectric::new(1.50);
     let left_bubble_material = Dielectric::new(1.0/1.50);
 
@@ -59,5 +59,7 @@ fn main() {
     camera.lookat = Point3::new_with(0.0, 0.0, -1.0);
     camera.vup = Vec3::new_with(0.0, 1.0, 0.0);
     camera.vfov = 20.0;
+    camera.defocus_angle = 10.0;
+    camera.focus_dist = 3.4;
     camera.render(&world);
 }
