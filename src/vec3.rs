@@ -24,7 +24,7 @@ impl Vec3 {
         Vec3::new_with(x, y, z)
     }
 
-    pub fn random_with(min: f64, max: f64) -> Vec3 {
+    pub fn random_within(min: f64, max: f64) -> Vec3 {
         let mut rng = rand::thread_rng();
         let x = rng.gen_range(min..max);
         let y = rng.gen_range(min..max);
@@ -34,7 +34,7 @@ impl Vec3 {
 
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
-            let p = Vec3::random_with(-1.0, 1.0);
+            let p = Vec3::random_within(-1.0, 1.0);
             if p.len_squared() < 1.0 {
                 return p;
             }
