@@ -20,6 +20,8 @@ pub struct Camera {
     pub focus_dist: f64,
     pub samples_per_pixel: u16,
     pub max_bounces: u16,
+    pub start_time: f64,
+    pub end_time: f64,
     u: Vec3,
     v: Vec3,
     w: Vec3,
@@ -49,6 +51,9 @@ impl Camera {
         let defocus_angle = 0.0;
         let focus_dist = 10.0;
 
+        let time0 = 0.0;
+        let time1 = 0.0;
+
         Camera {
             image_width,
             aspect_ratio,
@@ -61,6 +66,8 @@ impl Camera {
             defocus_angle,
             focus_dist,
             image_height: 0,
+            start_time: time0,
+            end_time: time1,
             u: Vec3::new(),
             w: Vec3::new(),
             v: Vec3::new(),
@@ -109,7 +116,7 @@ impl Camera {
         self.defocus_disk_v = &self.v * defocus_radius;
     }
 
-    pub fn render(&mut self, world: &dyn Hittable) {
+    pub fn render(&mut self, world: &mut dyn Hittable) {
         self.initialize();
         println!("P3");
         println!("{} {}", self.image_width, self.image_height);
@@ -146,7 +153,13 @@ impl Camera {
         };
         let ray_direction = &pixel_sample - &ray_origin;
 
-        Ray::new(ray_origin, ray_direction)
+        let mut rng = rand::thread_rng();
+        let time = if self.end_time > self.start_time {
+            rng.gen_range(self.start_time..self.end_time)
+        } else {
+            self.start_time
+        };
+        Ray::new(ray_origin, ray_direction, time)
     }
 
     fn sample_square() -> Vec3 {
@@ -161,7 +174,7 @@ impl Camera {
         &(&self.center + &(p.x() * &self.defocus_disk_u)) + &(p.y() * &self.defocus_disk_v)
     }
 
-    fn ray_color(&self, ray: &Ray, depth: u16, world: &dyn Hittable) -> Color {
+    fn ray_color(&self, ray: &Ray, depth: u16, world: &mut dyn Hittable) -> Color {
         if depth <= 0 {
             return Color::new();
         }
