@@ -181,19 +181,16 @@ impl Camera {
 
         match world.hits(ray, 0.001..utils::INFINITY) {
             Some(hit_record) => {
+                let mut emitted = hit_record.material.emit(&ray, &hit_record);
                 if let Some((attenuation, scattered)) =
                     hit_record.material.scatter(ray, &hit_record)
                 {
-                    let color = self.ray_color(&scattered, depth - 1, world);
-                    return &color * &attenuation;
+                    emitted += &attenuation * &self.ray_color(&scattered, depth - 1, world) 
                 }
-                return Color::new();
+                emitted
             }
             None => {
-                let unit_direction = ray.direction().unit_vector();
-                let a = 0.5 * (unit_direction.y() + 1.0);
-                &((1.0 - a) * &Color::new_with(1.0, 1.0, 1.0))
-                    + &(a * &Color::new_with(0.5, 0.7, 1.0))
+                Color::new()
             }
         }
     }

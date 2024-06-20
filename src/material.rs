@@ -8,6 +8,11 @@ pub trait Material {
     fn scatter(&self, ray_in: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
         None
     }
+
+    #[allow(unused_variables)]
+    fn emit(&self, ray_in: &Ray, rec: &HitRecord) -> Color {
+        Color::new()
+    }
 }
 
 pub struct LambertianMaterial {
@@ -72,7 +77,7 @@ impl Dielectric {
     pub fn reflectance(cosine: f64, refraction_index: f64) -> f64 {
         let mut r0 = (1.0 - refraction_index) / (1.0 + refraction_index);
         r0 = r0.powi(2);
-        r0 + (1.0 - r0)*(1.0 - cosine).powi(5)
+        r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
     }
 }
 
@@ -102,5 +107,27 @@ impl Material for Dielectric {
         let scattered = Ray::new(rec.p.clone(), direction, ray_in.time());
         let attenuation = Color::new_with(1.0, 1.0, 1.0);
         Some((attenuation, scattered))
+    }
+}
+
+pub struct LightDiffuser {
+    color: Color,
+}
+
+impl LightDiffuser {
+    pub fn new(color: &Color) -> LightDiffuser {
+        LightDiffuser {
+            color: color.clone(),
+        }
+    }
+}
+
+impl Material for LightDiffuser {
+    fn scatter(&self, _ray_in: &Ray, _rec: &HitRecord) -> Option<(Color, Ray)> {
+        None
+    }
+
+    fn emit(&self, _ray_in: &Ray, _rec: &HitRecord) -> Color {
+        self.color.clone()
     }
 }

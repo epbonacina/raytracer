@@ -8,7 +8,7 @@ mod sphere;
 mod utils;
 mod vec3;
 
-use material::Dielectric;
+use material::{Dielectric, LightDiffuser};
 use rand::Rng;
 
 use crate::{
@@ -82,7 +82,7 @@ fn main() {
         }
     }
 
-    let left_ball_material = LambertianMaterial::new(&Color::new_with(0.1, 0.2, 0.5));
+    let left_ball_material = LightDiffuser::new(&Color::new_with(0.9, 0.9, 0.9));
     let right_ball_material = Metal::new(&Color::new_with(0.8, 0.6, 0.2), 0.0);
     let middle_ball_material = Dielectric::new(1.50);
     let middle_ball_component_material = Dielectric::new(1.0 / 1.50);
@@ -121,8 +121,8 @@ fn main() {
     )));
 
     let mut camera = Camera::new();
-    camera.image_width = 400;
-    camera.samples_per_pixel = 100;
+    camera.image_width = 1200;
+    camera.samples_per_pixel = 500;
     camera.max_bounces = 10;
     camera.vfov = 20.0;
     camera.lookfrom = Point3::new_with(13.0, 2.0, 3.0);
