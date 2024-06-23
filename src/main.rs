@@ -15,7 +15,7 @@ use crate::{
     camera::Camera,
     color::Color,
     hittable_list::HittableList,
-    material::{LambertianMaterial, Metal},
+    material::{LambertianMaterial, Metal, Smoke},
     sphere::Sphere,
     vec3::{Point3, Vec3},
 };
@@ -55,7 +55,7 @@ fn main() {
                         1.0,
                         sphere_material,
                     )));
-                } else if chosen_material < 0.95 {
+                } else if chosen_material < 0.90 {
                     let albedo = &Color::random_within(0.5, 1.0);
                     let fuzz = rng.gen_range(0.0..0.5);
                     let sphere_material = Box::new(Metal::new(&albedo, fuzz));
@@ -67,8 +67,18 @@ fn main() {
                         0.0,
                         sphere_material,
                     )));
-                } else {
+                } else if chosen_material < 0.95 {
                     let sphere_material = Box::new(Dielectric::new(1.50));
+                    world.add(Box::new(Sphere::new(
+                        &center_start,
+                        &center_start,
+                        0.2,
+                        0.0,
+                        0.0,
+                        sphere_material,
+                    )));
+                } else {
+                    let sphere_material = Box::new(Smoke::new(&Color::new_with(0.5, 0.5, 0.5), 0.8));
                     world.add(Box::new(Sphere::new(
                         &center_start,
                         &center_start,
@@ -121,8 +131,8 @@ fn main() {
     )));
 
     let mut camera = Camera::new();
-    camera.image_width = 1200;
-    camera.samples_per_pixel = 500;
+    camera.image_width = 240;
+    camera.samples_per_pixel = 50;
     camera.max_bounces = 10;
     camera.vfov = 20.0;
     camera.lookfrom = Point3::new_with(13.0, 2.0, 3.0);
